@@ -1,11 +1,18 @@
 """Diagnostics must remain usable on CPU-only or unavailable-GPU hosts."""
 
 import importlib.metadata
+import platform
 import subprocess
 import unittest
 from unittest.mock import patch
 
 from selfie_guard.cli import environment_report
+
+
+def setUpModule():
+    # On Windows, Python 3.11 runs `ver` through subprocess on the first uname call
+    # and caches the result; do that before the tests mock subprocess.run.
+    platform.uname()
 
 
 class DoctorTests(unittest.TestCase):
