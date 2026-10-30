@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+work/
+.env
+.env.*
+.DS_Store
+Thumbs.db
+
+docs-internal/
+AGENTS.md
+
+# Private images, model weights and experiment outputs stay local.
+/data/*
+!/data/README.md
+/models/
+/runs/
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.gguf

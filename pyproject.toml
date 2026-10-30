@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "selfie-guard"
+version = "0.0.1"
+description = "Local research toolkit for evaluating protection against unwanted image editing"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [{name = "pvnc228"}]
+dependencies = []
+
+[project.scripts]
+selfie-guard = "selfie_guard.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["selfie_guard*"]
