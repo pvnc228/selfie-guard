@@ -1,7 +1,7 @@
 # Experiment protocol
 
-Only a technical control without protection has been run so far (`r1_e0/e0.py`); no
-protection has been tested. Keep real results in `runs/<run-id>/`, source data
+A technical control without protection has been run (`r1_e0/e0.py`). A VAE-only attack
+exists (`r1_e1/`), but no protective effect on edits has been measured. Keep real results in `runs/<run-id>/`, source data
 in `data/` and weights in `models/`. These directories are local and excluded from
 Git. Publish only a sanitized report.
 
@@ -44,7 +44,7 @@ Results on proxy tasks do not confirm protection against intimate fakes.
 
 Default attacker budget in tests: 50 attempts per photo.
 
-### Manual scoring scale (draft v1)
+### Manual scoring scale (v1)
 
 Score each output on three independent criteria:
 
