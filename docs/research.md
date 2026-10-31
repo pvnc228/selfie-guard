@@ -52,6 +52,20 @@ Before adapting a method, read the current code of the target pipeline and find
 every path through which the input image affects the result. Attacking a single VAE
 may not be enough.
 
+### Input paths in Qwen-Image-2.1 (code read on 2026-10-31)
+
+Read in `pipeline_qwenimage21.py` at diffusers commit `86ef420`, with checkpoint
+configs of `Qwen/Qwen-Image-2.1-Turbo` at revision `fc13ba1`. No model was run.
+
+- A condition image takes two paths: the Qwen3-VL vision encoder, as context inside
+  the prompt embeddings, and the VAE, as latent tokens prepended to the noise.
+- One resize to the target area feeds both paths. The vision path then goes through
+  a processor on PIL images, so optimization needs a differentiable replacement.
+- The pipeline `__call__` runs under `torch.no_grad()`, so an end-to-end attack
+  cannot call it directly.
+- A VAE-only attack covers one of the two paths. Whether the vision path can restore
+  the edit is an open question for the first experiment.
+
 ## Hypotheses that must not be presented as fact
 
 - "Replacing the VAE in PhotoGuard is enough."

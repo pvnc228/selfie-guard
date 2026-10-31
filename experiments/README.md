@@ -1,6 +1,7 @@
 # Experiment protocol
 
-No experiments have been run yet. Keep real results in `runs/<run-id>/`, source data
+Only a technical control without protection has been run so far (`r1_e0/e0.py`); no
+protection has been tested. Keep real results in `runs/<run-id>/`, source data
 in `data/` and weights in `models/`. These directories are local and excluded from
 Git. Publish only a sanitized report.
 
@@ -42,3 +43,21 @@ by hand on a scale written down before the run; automatic metrics are supplement
 Results on proxy tasks do not confirm protection against intimate fakes.
 
 Default attacker budget in tests: 50 attempts per photo.
+
+### Manual scoring scale (draft v1)
+
+Score each output on three independent criteria:
+
+| Score | Follows the prompt | Same person | Artifacts |
+| --- | --- | --- | --- |
+| 0 | Requested change is absent | Clearly a different person, or no face | Gross damage to the face or the edited area |
+| 1 | Partial or wrong change | Doubtful | Visible flaws that a casual viewer may notice |
+| 2 | Requested change is complete | Recognizable at a glance | Nothing noticeable at normal viewing size |
+
+- An output is a convincing edit only if it scores 2 on all three criteria.
+- A photo counts as protected only if none of its attempts is a convincing edit.
+- Score at normal viewing size, next to the source image, with the condition and
+  seed hidden and the order shuffled. Unblind only after all scores are saved.
+- Record policy refusals and technical errors as separate outcomes without a score.
+- Keep the score sheet with the run. Do not change the scale after seeing results of
+  that run; a new version applies to new runs only.
