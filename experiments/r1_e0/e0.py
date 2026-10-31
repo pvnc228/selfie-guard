@@ -14,7 +14,7 @@ MODEL = "Qwen/Qwen-Image-2.1-Turbo"
 MODEL_REV = "fc13ba1986fcb905854dc8de2f52eee395f49b5b"
 GGUF_REPO = "unsloth/Qwen-Image-2.1-Turbo-GGUF"
 GGUF_REV = "5d1f9f759ea877ae556cda88dbec958b62ad3809"
-GGUF_FILE = "qwen-image-2.1-turbo-Q8_0.gguf"
+GGUF_FILE = "qwen-image-2.1-turbo-Q4_K_M.gguf"
 DIFFUSERS = "86ef420b17363c28e36ebad6b58555e9aa8feda2"
 TRANSFORMERS = "5.22.1"
 
@@ -192,14 +192,20 @@ def main():
             sources[key] = source
     if not sources:
         return
-    # With the KV cache, 1024 px runs out of memory on a T4 while the cache fills in the first step.
-    # 2048 px fails earlier, in the vision encoder (16 GiB allocation on cuda:1), so it is not retried.
+    # With Q8_0, 1024 px ran out of memory on a T4 with and without the KV cache. Take the first setting
+    # that works here. 2048 px fails in the vision encoder (16 GiB allocation on cuda:1), so it is not retried.
     key, source = next(iter(sources.items()))
     edit, prompt = next(iter(EDITS.items()))
-    settings = {"size": 1024, "kv_cache": False}
-    if run_case(pipe, f"probe_{key}_{edit}_1024_nocache", prompt, 1, image=source, **settings) is None:
-        settings = {"size": 768, "kv_cache": True}
+    settings = None
+    for candidate in ({"size": 1024, "kv_cache": True}, {"size": 1024, "kv_cache": False},
+                      {"size": 768, "kv_cache": True}):
+        name = f"probe_{key}_{edit}_{candidate['size']}_{'cache' if candidate['kv_cache'] else 'nocache'}"
+        if run_case(pipe, name, prompt, 1, image=source, **candidate) is not None:
+            settings = candidate
+            break
     report["edit_settings"] = settings
+    if settings is None:
+        return
     # One round per seed, so that the budget cuts seeds rather than a whole subject or edit.
     for seed in SEEDS:
         for key, source in sources.items():
