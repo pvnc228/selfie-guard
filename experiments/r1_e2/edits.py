@@ -1,6 +1,6 @@
 # R1 E2 robustness check on Kaggle T4 x2, edits only: the attack took about 25 s per iteration on a T4 (check.py), so
 # the images come from experiments/r1_e2/pgd_both.py --eot and transforms.py on a local GPU through a private dataset.
-# Where does the stop end: does the attack on the deepstack features stop edits on faces a and b after JPEG 85 and 80?
+# With resize down to 0.3 in its loop, does the deepstack attack stop edits after a resize to 50 and 45 % and JPEG 80?
 # Earlier versions of this script, with other inputs, are the E2 checks recorded in the journal.
 # Not a pilot: two photos cannot show a protection rate. Results go to /kaggle/working, weights to /tmp.
 import gc
@@ -26,12 +26,15 @@ SIZE = 768
 INPUTS = {
     "a_source": "e88c9796877f75c602d73cf1849056954fe63ba04ea7d79d2a418456c8360fc3",
     "b_source": "eb9e1862b9726b3288c64793917c1c776211135d24bd205814c76d82524bc7d0",
-    "a_deep_jpeg85": "e53badc73b89e00b76a751e3330413b901882bb4571ed6ec80df8ed7ccb46829",
-    "a_deep_jpeg80": "e8016606d158a3cbdbeb781775257286e0ee019b2085f443934822fbf96cab1e",
-    "b_deep_jpeg85": "30c64e97ec632683c73371f53221efd880c8ce40e77db963e5a25b39c84db85e",
-    "b_deep_jpeg80": "6706fcfc938f56ec261537d6e60e064c2b2d219802f9914f68fbd62554bc9410",
+    "a_s30_resize50": "f5c6aaaaa4b13e0845313b2ebf88a660f6e7f7b85520f07c277e28a65c469e34",
+    "a_s30_resize45": "26ccf5110b93042cf59c50953a48636d959558287a288cdfc7120d342ef28b24",
+    "a_s30_jpeg80": "28bf6015f884d88bb613a3f870cef74399ca2c609f45cdd1e7ecb64817ab2f39",
+    "b_s30_resize50": "9c3d24b8f05582bff40b75032bc1546d69630d57512a91cd75b7261d8a97ccaf",
+    "b_s30_resize45": "c78203e5cf22e5f366fa0d654d266d098deb8af0b0bd72836cf42c04851447cf",
+    "b_s30_jpeg80": "cc47dae0d1ea12a2adcff38472abab33e61288ecbbc4cb857bc7f83e748e51eb",
 }
-CASES = [(f"{face}_deep_jpeg{quality}", seed) for face in "ab" for quality in (85, 80) for seed in (1, 2)]  # input, seed
+COPIES = ("resize50", "resize45", "jpeg80")
+CASES = [(f"{face}_s30_{copy}", seed) for face in "ab" for copy in COPIES for seed in (1, 2)]  # input, seed
 OUT = "/kaggle/working"
 START = time.time()
 

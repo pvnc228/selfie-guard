@@ -35,6 +35,7 @@ parser.add_argument("--iters", type=int, default=check.ITERS)
 parser.add_argument("--views", choices=["all", "jpeg", "jpeg_only"], default="all",
                     help="with --eot: leave out the resize, or also the unchanged file")
 parser.add_argument("--quality", nargs=2, type=int, default=[70, 95], help="with --eot: JPEG quality range, inclusive")
+parser.add_argument("--scale", nargs=2, type=float, default=[0.5, 0.9], help="with --eot: resize scale range")
 parser.add_argument("--target", choices=["none", "gray"], default="none", help="pull features to a target image")
 parser.add_argument("--features", choices=["all", "pooled", "deep"], default="all", help="features the loss uses")
 parser.add_argument("--eps", type=float, default=check.EPS, help="L-inf budget on the [-1, 1] scale")
@@ -93,13 +94,13 @@ rgb = torch.tensor([1.0, 1.0, 1.0, 0.0], device="cuda:0", dtype=DTYPE).view(1, 4
 
 
 def shared_copy(image):
-    # One of: the file as is, a JPEG of the --quality range, or a bicubic round trip through a scale of 0.5-0.9.
+    # One of: the file as is, a JPEG of the --quality range, or a bicubic round trip through a --scale.
     kind = 1 if args.views == "jpeg_only" else torch.randint(2 if args.views == "jpeg" else 3, (1,)).item()
     if kind == 0:
         return image
     if kind == 1:
         return jpeg(image, torch.randint(args.quality[0], args.quality[1] + 1, (1,)).item()).to(image.dtype)
-    size = int(image.shape[-1] * (0.5 + 0.4 * torch.rand(1).item()))
+    size = int(image.shape[-1] * (args.scale[0] + (args.scale[1] - args.scale[0]) * torch.rand(1).item()))
     small = F.interpolate(image.float(), size=(size, size), mode="bicubic", antialias=True)
     return F.interpolate(small, size=image.shape[-2:], mode="bicubic", antialias=True).to(image.dtype)
 
